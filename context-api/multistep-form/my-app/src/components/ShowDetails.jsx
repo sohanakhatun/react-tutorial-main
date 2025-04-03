@@ -51,7 +51,7 @@ const ShowDetails = ({ formData }) => {
             <strong>Expiry:</strong> {formData.paymentInfo?.expiry || "N/A"}
           </p>
           <p className="text-gray-600">
-            <strong>CVV:</strong> ***
+            <strong>CVV:</strong> {formData.paymentInfo?.cvv || "N/A"}
           </p>
         </div>
       </div>
