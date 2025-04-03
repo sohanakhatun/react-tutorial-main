@@ -5,6 +5,8 @@ import { CartProvider } from "./context/cartContext";
 import Cart from "./components/Cart";
 import { WishlistProvider } from "./context/wishlistContext";
 import Wishlist from "./components/Wishlist";
+import { UserContextProvider } from "./context/UserContext";
+import Login from "./components/Login";
 function App() {
   const [products, setProducts] = useState([]);
 
@@ -119,50 +121,88 @@ function App() {
       setWishlistItemCount(wishlistItem.length);
     }
   }, [wishlistItem]);
-  
+
+  // User Authentication
+  const [user, setUser] = useState(null);
+  const [password, setPassword] = useState("");
+
+  const setUserDetails = (user, password) => {
+    setUser(user);
+    setPassword(password);
+  };
+
+  useEffect(() => {
+    const userDetails = JSON.parse(localStorage.getItem("userDetails")) || [];
+    if (userDetails.length > 0) {
+      setUser(userDetails);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user !== null) {
+      localStorage.setItem("userDetails", JSON.stringify(user));
+    }
+  }, [user]);
+
   return (
     <>
-      <WishlistProvider
-        value={{ wishlistItem, addToWishlist, removeFromWishlist, moveToCart }}
-      >
-        <CartProvider
-          value={{
-            cartItem,
-            addToCart,
-            removeFromCart,
-            increaseQuantity,
-            decreaseQuantity,
-          }}
-        >
-          <div className="flex flex-wrap gap-2">
-            {products.map((product) => (
-              <ProductCards
-                key={product.id}
-                product={product}
-                addToWishlist={addToWishlist}
-              />
-            ))}
-          </div>
+      <UserContextProvider value={{ user, setUserDetails, password }}>
+        {user ? (
           <div>
-            <Cart
-              cartItem={cartItem}
-              cartCount={cartCount}
-              increaseQuantity={increaseQuantity}
-              decreaseQuantity={decreaseQuantity}
-              removeFromCart={removeFromCart}
-            />
-          </div>
+            <h1 className="text-2xl font-semibold mb-4 capitalize">
+              Hi {user} ,Welcome!.
+            </h1>
+            <WishlistProvider
+              value={{
+                wishlistItem,
+                addToWishlist,
+                removeFromWishlist,
+                moveToCart,
+              }}
+            >
+              <CartProvider
+                value={{
+                  cartItem,
+                  addToCart,
+                  removeFromCart,
+                  increaseQuantity,
+                  decreaseQuantity,
+                }}
+              >
+                <div className="flex flex-wrap gap-2">
+                  {products.map((product) => (
+                    <ProductCards
+                      key={product.id}
+                      product={product}
+                      addToWishlist={addToWishlist}
+                    />
+                  ))}
+                </div>
+                <div>
+                  <Cart
+                    cartItem={cartItem}
+                    cartCount={cartCount}
+                    increaseQuantity={increaseQuantity}
+                    decreaseQuantity={decreaseQuantity}
+                    removeFromCart={removeFromCart}
+                  />
+                </div>
 
-          <div>
-            <Wishlist
-              wishlistItem={wishlistItem}
-              removeFromWishlist={removeFromWishlist}
-              wishlistItemCount={wishlistItemCount}
-              moveToCart={moveToCart}
-            />
+                <div>
+                  <Wishlist
+                    wishlistItem={wishlistItem}
+                    removeFromWishlist={removeFromWishlist}
+                    wishlistItemCount={wishlistItemCount}
+                    moveToCart={moveToCart}
+                  />
+                </div>
+              </CartProvider>
+            </WishlistProvider>
           </div>
-        </CartProvider>
-      </WishlistProvider>
+        ) : (
+          <Login />
+        )}
+      </UserContextProvider>
     </>
   );
 }

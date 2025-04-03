@@ -7,7 +7,6 @@ const ProductCards = ({ product }) => {
   const { addToWishlist } = useWishlist();
 
   const addToCartHandler = () => {
-    console.log(product)
     addToCart(product);
     alert("Product Added to cart!")
   };
